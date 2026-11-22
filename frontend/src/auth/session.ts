@@ -1,6 +1,7 @@
 import { reactive } from 'vue'
 import { getSession, setCsrfToken, startDemo, stopDemo } from '../api/client'
 import type { UserProfile } from '../api/types'
+import { bootStage } from '../utils/boot'
 
 const routerBase =
   import.meta.env.VITE_ROUTER_BASE || import.meta.env.BASE_URL
@@ -27,12 +28,14 @@ export async function ensureSession(force = false): Promise<void> {
   }
   sessionPromise = (async () => {
     try {
+      bootStage('正在检查登录状态', 18)
       let session = await getSession()
       if (session.user?.is_demo && onLoginPage()) {
         await stopDemo().catch(() => undefined)
         session = { authenticated: false, user: null, csrf_token: null }
       } else if (!session.user && !onLoginPage()) {
         try {
+          bootStage('正在准备示例空间', 40)
           const demo = await startDemo()
           session = demo.user
             ? {
@@ -49,6 +52,7 @@ export async function ensureSession(force = false): Promise<void> {
       authState.csrfToken = session.csrf_token || ''
       authState.error = ''
       setCsrfToken(session.csrf_token)
+      bootStage('正在读取笔记', 66)
     } catch {
       authState.user = null
       authState.csrfToken = ''

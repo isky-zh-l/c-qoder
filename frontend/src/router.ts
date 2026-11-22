@@ -6,6 +6,7 @@ import {
 } from './utils/navigation'
 import { saveScrollPosition } from './utils/scrollMemory'
 import WorkspaceView from './views/WorkspaceView.vue'
+import { beginProgress, endProgress } from './utils/progress'
 
 const routerBase =
   import.meta.env.VITE_ROUTER_BASE || import.meta.env.BASE_URL
@@ -64,6 +65,7 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, from) => {
+  beginProgress()
   if (from.name && from.fullPath !== to.fullPath) {
     saveScrollPosition(from.fullPath)
   }
@@ -94,8 +96,13 @@ router.beforeEach(async (to, from) => {
 })
 
 router.afterEach((to) => {
+  endProgress()
   const title = typeof to.meta.title === 'string' ? to.meta.title : ''
   document.title = title ? `${title} · C 语言学习笔记` : 'C 语言学习笔记'
+})
+
+router.onError(() => {
+  endProgress()
 })
 
 export default router

@@ -35,6 +35,7 @@ import {
   type EditorModuleType,
 } from '../utils/editorModel'
 import { sourceFromModules } from '../utils/source'
+import { beginProgress, endProgress } from '../utils/progress'
 import ChapterPicker from '../components/ChapterPicker.vue'
 import DocumentBlocks from '../components/DocumentBlocks.vue'
 import EditorModuleCard from '../components/EditorModuleCard.vue'
@@ -284,6 +285,7 @@ async function loadDocument(showLoading = true) {
   if (showLoading) {
     loading.value = true
     loadError.value = ''
+    beginProgress()
   }
   try {
     const id = Number(route.params.id)
@@ -328,6 +330,7 @@ async function loadDocument(showLoading = true) {
     if (token === loadToken) {
       loading.value = false
     }
+    if (showLoading) endProgress()
   }
 }
 

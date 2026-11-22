@@ -17,6 +17,7 @@ import {
   consumeHomeReturn,
   restoreScrollPosition,
 } from '../utils/scrollMemory'
+import { beginProgress, endProgress } from '../utils/progress'
 import DeleteDocumentDialog from '../components/DeleteDocumentDialog.vue'
 import DocumentBlocks from '../components/DocumentBlocks.vue'
 import EditDocumentDialog from '../components/EditDocumentDialog.vue'
@@ -138,6 +139,7 @@ async function loadDocument(showLoading = true) {
   if (showLoading) {
     loading.value = true
     document.value = null
+    beginProgress()
   }
   errorMessage.value = ''
   try {
@@ -173,6 +175,7 @@ async function loadDocument(showLoading = true) {
     if (token === loadToken) {
       loading.value = false
     }
+    if (showLoading) endProgress()
   }
 }
 

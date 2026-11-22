@@ -11,9 +11,21 @@ export default defineConfig(({ mode }) => {
   const base = normalizeBase(env.VITE_BASE_PATH || '/c/')
   const proxyTarget = env.VITE_DEV_PROXY_TARGET || 'http://127.0.0.1:8000'
 
+  const asyncMainCss = {
+    name: 'async-main-css',
+    enforce: 'post' as const,
+    transformIndexHtml(html: string) {
+      return html.replace(/<link rel="stylesheet"([^>]*)>/g, (match, attrs) =>
+        /data-cq-main/.test(attrs)
+          ? match
+          : `<link rel="stylesheet"${attrs} data-cq-main media="print" onload="this.media='all'">`,
+      )
+    },
+  }
+
   return {
     base,
-    plugins: [vue()],
+    plugins: [vue(), asyncMainCss],
     build: {
       outDir: env.VITE_OUT_DIR || 'dist',
       emptyOutDir: true,

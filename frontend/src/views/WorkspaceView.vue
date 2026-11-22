@@ -34,6 +34,8 @@ import type {
 } from '../api/types'
 import { siteTitle } from '../site'
 import { formatBytes } from '../utils/format'
+import { beginProgress, endProgress } from '../utils/progress'
+import { bootStage } from '../utils/boot'
 import {
   rememberHomeReturn,
   restoreScrollPosition,
@@ -602,15 +604,19 @@ function prefetchReader() {
 
 async function bootstrap() {
   workspaceLoading.value = true
+  beginProgress()
+  bootStage('正在读取笔记', 72)
   try {
     await Promise.all([loadWorkspace(true), loadDocuments(true)])
     if (!workspaceError.value) {
       await nextTick()
       restoreScrollPosition(route.fullPath)
+      bootStage('正在打开工作区', 94)
       prefetchReader()
     }
   } finally {
     workspaceLoading.value = false
+    endProgress()
   }
 }
 
