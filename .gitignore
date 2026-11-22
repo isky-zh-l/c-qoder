@@ -1,0 +1,62 @@
+# Python
+backend/.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Secrets and local config
+.env
+backend/.env
+frontend/.env
+frontend/.env.local
+
+# Data
+backend/data/*.db
+backend/data/*.db-shm
+backend/data/*.db-wal
+backend/data/uploads/
+backend/data/backups/
+backend/data/mailbox/
+
+# Node
+frontend/node_modules/
+frontend/dist/
+
+# Local QA artifacts
+shot-*.png
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+# Production secrets
+backend/.env.production
+frontend/.env.production
+
+# Qoder Sites local binding and build output
+*.qoder.site
+qoder-site/dist/
+
+# Local backend data and caches
+backend/data/
+backend/.pytest_cache/
+
+# Local-only docs, screenshots, working notes and submission material
+docs/
+AGENTS.md
+milestones.md
+requirements.md
+开发交接-C学习手记.md
+素材/notes/
+素材/接手记录.md
+素材/exam.html
+
+# Content sources and generated demo seeds (kept locally, not part of the shared source)
+素材/
+qoder-site/functions/demo-notes.mjs
+qoder-site/dev/build-demo-notes.mjs
+
+# Local dev artifacts
+qoder-site/dev/c2-visual.md
+qoder-site/dev/e2e-public.png

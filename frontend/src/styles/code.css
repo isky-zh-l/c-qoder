@@ -1,0 +1,61 @@
+.tok-comment {
+  color: #6a9955;
+  font-style: italic;
+}
+
+.tok-string {
+  color: #ce9178;
+}
+
+.tok-number {
+  color: #b5cea8;
+}
+
+.tok-keyword {
+  color: #c586c0;
+  font-weight: 600;
+}
+
+.tok-type {
+  color: #4ec9b0;
+}
+
+.tok-function {
+  color: #dcdcaa;
+}
+
+.tok-preproc {
+  color: #d7ba7d;
+}
+
+.tok-ident {
+  color: #d4d4d4;
+}
+
+.tok-bracket {
+  font-weight: 600;
+}
+
+.tok-bracket.br-1 {
+  color: #ffd700;
+}
+
+.tok-bracket.br-2 {
+  color: #da70d6;
+}
+
+.tok-bracket.br-3 {
+  color: #179fff;
+}
+
+.tok-bracket.br-4 {
+  color: #ff8f66;
+}
+
+.tok-bracket.br-5 {
+  color: #7ee787;
+}
+
+.tok-bracket.br-6 {
+  color: #e2c08d;
+}
