@@ -44,7 +44,6 @@ backend/.pytest_cache/
 
 # Local-only docs, screenshots, working notes and submission material
 docs/
-AGENTS.md
 milestones.md
 requirements.md
 开发交接-C学习手记.md
