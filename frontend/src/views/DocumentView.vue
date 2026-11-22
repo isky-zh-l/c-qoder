@@ -18,6 +18,7 @@ import {
   restoreScrollPosition,
 } from '../utils/scrollMemory'
 import { beginProgress, endProgress } from '../utils/progress'
+import { currentPageLoadingToken, endPageLoading } from '../utils/pageLoading'
 import DeleteDocumentDialog from '../components/DeleteDocumentDialog.vue'
 import DocumentBlocks from '../components/DocumentBlocks.vue'
 import EditDocumentDialog from '../components/EditDocumentDialog.vue'
@@ -136,6 +137,7 @@ async function loadWorkspace() {
 
 async function loadDocument(showLoading = true) {
   const token = ++loadToken
+  const pageToken = currentPageLoadingToken()
   if (showLoading) {
     loading.value = true
     document.value = null
@@ -175,7 +177,10 @@ async function loadDocument(showLoading = true) {
     if (token === loadToken) {
       loading.value = false
     }
-    if (showLoading) endProgress()
+    if (showLoading) {
+      endProgress()
+      endPageLoading(pageToken)
+    }
   }
 }
 

@@ -90,58 +90,60 @@ onBeforeUnmount(() => {
 
 <template>
   <article
-    class="doc-card"
+    class="doc-card v2"
     :class="[kindClass, { 'is-sorting': sorting }]"
     :data-doc-id="doc.id"
   >
-    <button
-      v-if="canReorder"
-      type="button"
-      class="drag-handle"
-      :disabled="sorting"
-      :aria-label="`拖动排序 ${doc.title}`"
-      title="拖动排序"
-      @pointerdown.stop.prevent="emit('drag-start', $event, doc)"
-    >
-      <svg viewBox="0 0 14 20" fill="currentColor" aria-hidden="true">
-        <circle cx="4" cy="5" r="1.1" />
-        <circle cx="10" cy="5" r="1.1" />
-        <circle cx="4" cy="10" r="1.1" />
-        <circle cx="10" cy="10" r="1.1" />
-        <circle cx="4" cy="15" r="1.1" />
-        <circle cx="10" cy="15" r="1.1" />
-      </svg>
-    </button>
-
     <RouterLink
       class="doc-main"
       :to="{ name: 'document', params: { id: doc.id } }"
     >
-      <div class="doc-topline">
-        <span class="kind-badge">{{ kindLabel }}</span>
-        <span v-if="doc.is_favorite" class="favorite-mark" title="已收藏">
-          <svg viewBox="0 0 20 20" aria-hidden="true">
-            <path
-              d="m10 2.6 2.1 4.3 4.8.7-3.5 3.4.8 4.7L10 13.5l-4.2 2.2.8-4.7L3.1 7.6l4.8-.7L10 2.6Z"
-            />
-          </svg>
-        </span>
-        <span class="visibility-badge" :class="doc.visibility">
-          {{ doc.visibility === 'public' ? '公开' : '私有' }}
-        </span>
-      </div>
+      <span class="doc-icon" aria-hidden="true">
+        <svg v-if="doc.kind === 'note'" viewBox="0 0 20 20" fill="none">
+          <path
+            d="M5 2.8h6.2L15 6.6v10.6H5z"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M11 3v4h4M7.5 10h5M7.5 12.6h4"
+            stroke="currentColor"
+            stroke-width="1.4"
+            stroke-linecap="round"
+          />
+        </svg>
+        <svg v-else viewBox="0 0 20 20" fill="none">
+          <path
+            d="m7.5 6-4 4 4 4M12.5 6l4 4-4 4"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </span>
 
-      <h3 class="doc-title">{{ doc.title }}</h3>
-      <p v-if="doc.summary" class="doc-summary">{{ doc.summary }}</p>
-      <p v-else class="doc-summary empty-summary">
-        {{ doc.kind === 'note' ? '还没有正文' : '源码文档' }}
-      </p>
-
-      <div class="doc-meta">
-        <span>{{ doc.chapter_name || '未分类' }}</span>
-        <span v-if="doc.folder_path" class="meta-folder">· {{ doc.folder_path }}</span>
-        <span class="meta-dot" aria-hidden="true"></span>
-        <time :datetime="doc.updated_at">{{ formattedTime }}</time>
+      <div class="doc-copy">
+        <div class="doc-heading">
+          <h3 class="doc-title">{{ doc.title }}</h3>
+          <span class="kind-tag">{{ kindLabel }}</span>
+          <span v-if="doc.visibility === 'public'" class="kind-tag public">
+            公开
+          </span>
+        </div>
+        <p v-if="doc.summary" class="doc-summary">{{ doc.summary }}</p>
+        <p v-else class="doc-summary empty-summary">
+          {{ doc.kind === 'note' ? '还没有正文' : '源码文档' }}
+        </p>
+        <div class="doc-meta">
+          <span class="doc-chapter">{{ doc.chapter_name || '未分类' }}</span>
+          <span v-if="doc.folder_path" class="meta-folder">
+            / {{ doc.folder_path }}
+          </span>
+          <span class="meta-dot" aria-hidden="true"></span>
+          <time :datetime="doc.updated_at">{{ formattedTime }}</time>
+        </div>
       </div>
     </RouterLink>
 
@@ -215,6 +217,25 @@ onBeforeUnmount(() => {
           </div>
         </Transition>
       </div>
+
+      <button
+        v-if="canReorder"
+        type="button"
+        class="drag-handle"
+        :disabled="sorting"
+        :aria-label="`拖动排序 ${doc.title}`"
+        title="拖动排序"
+        @pointerdown.stop.prevent="emit('drag-start', $event, doc)"
+      >
+        <svg viewBox="0 0 14 20" fill="currentColor" aria-hidden="true">
+          <circle cx="4" cy="5" r="1.1" />
+          <circle cx="10" cy="5" r="1.1" />
+          <circle cx="4" cy="10" r="1.1" />
+          <circle cx="10" cy="10" r="1.1" />
+          <circle cx="4" cy="15" r="1.1" />
+          <circle cx="10" cy="15" r="1.1" />
+        </svg>
+      </button>
     </div>
 
     <div v-if="canReorder" class="sort-controls" aria-label="排序按钮">
@@ -675,6 +696,183 @@ onBeforeUnmount(() => {
 @media (hover: none) {
   .sort-controls {
     opacity: 1;
+  }
+}
+
+/* Reference-style file card */
+.doc-card.v2 {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid #e7e3f1;
+  border-radius: 13px;
+  background: #fff;
+  box-shadow: 0 2px 10px rgba(76, 55, 130, 0.05);
+}
+
+.doc-card.v2::before {
+  content: none;
+}
+
+.doc-card.v2 .doc-main {
+  display: flex;
+  flex: 1 1 auto;
+  gap: 14px;
+  align-items: flex-start;
+  min-width: 0;
+  padding: 16px 10px 16px 16px;
+}
+
+.doc-card.v2 .doc-icon {
+  display: grid;
+  flex: 0 0 42px;
+  place-items: center;
+  height: 42px;
+  border-radius: 11px;
+  color: #5437bd;
+  background: #eee8ff;
+}
+
+.doc-card.v2.kind-source .doc-icon {
+  color: #325a99;
+  background: #e9f1ff;
+}
+
+.doc-card.v2 .doc-icon svg {
+  width: 21px;
+  height: 21px;
+}
+
+.doc-card.v2 .doc-copy {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.doc-card.v2 .doc-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+}
+
+.doc-card.v2 .doc-title {
+  margin: 0;
+  color: #2f2745;
+  font-size: 18px;
+  font-weight: 720;
+  line-height: 1.42;
+  overflow-wrap: anywhere;
+}
+
+.doc-card.v2 .kind-tag {
+  flex: none;
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: #5437bd;
+  background: #eee8ff;
+  font-size: 11px;
+  font-weight: 620;
+  line-height: 1.45;
+}
+
+.doc-card.v2.kind-source .kind-tag {
+  color: #325a99;
+  background: #e9f1ff;
+}
+
+.doc-card.v2 .kind-tag.public {
+  color: #3e7059;
+  background: #e9f5ee;
+}
+
+.doc-card.v2 .doc-summary {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  margin: 6px 0 0;
+  color: #636178;
+  font-size: 13px;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+
+.doc-card.v2 .empty-summary {
+  color: #9a93ab;
+}
+
+.doc-card.v2 .doc-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 3px 9px;
+  margin-top: 8px;
+  color: #8a839c;
+  font-size: 12px;
+}
+
+.doc-card.v2 .doc-chapter {
+  color: #5437bd;
+  font-weight: 640;
+}
+
+.doc-card.v2.kind-source .doc-chapter {
+  color: #325a99;
+}
+
+.doc-card.v2 .doc-side {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 2px;
+  padding: 0 8px 0 0;
+}
+
+.doc-card.v2 .drag-handle {
+  position: static;
+  width: 30px;
+  height: 42px;
+  opacity: 0.55;
+}
+
+.doc-card.v2 .icon-button {
+  width: 32px;
+  height: 32px;
+}
+
+@media (max-width: 700px) {
+  .doc-card.v2 .doc-icon {
+    flex-basis: 36px;
+    height: 36px;
+    border-radius: 9px;
+  }
+
+  .doc-card.v2 .doc-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .doc-card.v2 .doc-main {
+    gap: 11px;
+    padding: 14px 6px 14px 13px;
+  }
+
+  .doc-card.v2 .doc-title {
+    font-size: 15.5px;
+  }
+
+  .doc-card.v2 .doc-summary {
+    font-size: 12.5px;
+  }
+
+  .doc-card.v2 .doc-side {
+    padding-right: 4px;
+  }
+
+  .doc-card.v2 .drag-handle {
+    display: none;
   }
 }
 </style>

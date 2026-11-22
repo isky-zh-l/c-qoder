@@ -36,6 +36,7 @@ import {
 } from '../utils/editorModel'
 import { sourceFromModules } from '../utils/source'
 import { beginProgress, endProgress } from '../utils/progress'
+import { currentPageLoadingToken, endPageLoading } from '../utils/pageLoading'
 import ChapterPicker from '../components/ChapterPicker.vue'
 import DocumentBlocks from '../components/DocumentBlocks.vue'
 import EditorModuleCard from '../components/EditorModuleCard.vue'
@@ -280,6 +281,7 @@ async function loadWorkspace() {
 
 async function loadDocument(showLoading = true) {
   const token = ++loadToken
+  const pageToken = currentPageLoadingToken()
   saveRequestId += 1
   saving.value = false
   if (showLoading) {
@@ -330,7 +332,10 @@ async function loadDocument(showLoading = true) {
     if (token === loadToken) {
       loading.value = false
     }
-    if (showLoading) endProgress()
+    if (showLoading) {
+      endProgress()
+      endPageLoading(pageToken)
+    }
   }
 }
 

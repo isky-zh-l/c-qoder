@@ -244,7 +244,7 @@ const currentTitle = computed(() => {
   if (scope.value === 'folder') {
     return currentFolder.value?.name || '文件夹'
   }
-  return '全部笔记'
+  return '全部文件'
 })
 const scopeEyebrow = computed(() => {
   if (scope.value === 'favorites') {
@@ -572,36 +572,6 @@ watch(
   },
 )
 
-function prefetchReader() {
-  const connection = (
-    navigator as Navigator & {
-      connection?: { saveData?: boolean; effectiveType?: string }
-    }
-  ).connection
-  if (connection?.saveData) return
-  if (connection?.effectiveType && /(^|-)2g$/.test(connection.effectiveType)) {
-    return
-  }
-  const run = () => {
-    void import('../views/DocumentView.vue')
-  }
-  const idle = (
-    window as Window & {
-      requestIdleCallback?: (
-        callback: () => void,
-        options?: { timeout?: number },
-      ) => number
-    }
-  ).requestIdleCallback
-  window.setTimeout(() => {
-    if (idle) {
-      idle(run, { timeout: 3000 })
-    } else {
-      run()
-    }
-  }, 2500)
-}
-
 async function bootstrap() {
   workspaceLoading.value = true
   beginProgress()
@@ -612,7 +582,6 @@ async function bootstrap() {
       await nextTick()
       restoreScrollPosition(route.fullPath)
       bootStage('正在打开工作区', 94)
-      prefetchReader()
     }
   } finally {
     workspaceLoading.value = false
@@ -1291,11 +1260,24 @@ onBeforeUnmount(() => {
         </div>
 
         <template v-else>
-          <header class="content-head">
+          <header v-if="scope === 'library'" class="intro">
+            <p class="intro-by">{{ user?.display_name || '示例学习者' }} 的学习手记</p>
+            <h1><span>C</span> 语言学习笔记</h1>
+            <p class="intro-desc">记录语法、练习题和写代码时遇到的问题。</p>
+          </header>
+
+          <header class="content-head" :class="{ 'files-head': scope === 'library' }">
             <div class="head-copy">
-              <p class="eyebrow">{{ scopeEyebrow }}</p>
+              <p v-if="scope !== 'library'" class="eyebrow">{{ scopeEyebrow }}</p>
               <h1>{{ currentTitle }}</h1>
               <p v-if="scopeDescription" class="lede">{{ scopeDescription }}</p>
+            </div>
+            <div v-if="scope === 'library'" class="files-meta">
+              <span class="storage-chip" :class="{ demo: user?.is_demo }">
+                <i aria-hidden="true"></i>
+                {{ user?.is_demo ? '示例空间' : '私有空间' }}
+              </span>
+              <span class="file-count">{{ currentCount }} 个文件</span>
             </div>
             <div class="head-actions">
               <button
@@ -1483,7 +1465,7 @@ onBeforeUnmount(() => {
               </div>
             </section>
 
-            <div class="context-bar">
+            <div v-if="scope !== 'library'" class="context-bar">
             <div class="context-copy">
               <span>当前范围</span>
               <strong>{{ currentTitle }}</strong>
@@ -1498,6 +1480,13 @@ onBeforeUnmount(() => {
           </div>
 
           <div class="library-wrap">
+            <p
+              v-if="workspaceLoading || listLoading"
+              class="list-loading"
+              role="status"
+            >
+              正在读取笔记…
+            </p>
             <DocumentList
               :documents="documents"
               :loading="listLoading || workspaceLoading"
@@ -1934,12 +1923,143 @@ onBeforeUnmount(() => {
   padding: 44px 48px 48px;
 }
 
+.list-loading {
+  margin: 0 0 8px;
+  padding: 0 2px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.intro {
+  margin: 0 0 24px;
+  padding: 0 1px;
+  animation: content-in 0.32s ease both;
+}
+
+.intro-by {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 8px;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+}
+
+.intro-by::before {
+  content: "";
+  width: 17px;
+  height: 3px;
+  border-radius: 99px;
+  background: var(--accent);
+}
+
+.intro h1 {
+  margin: 0;
+  color: #2f2745;
+  font-size: clamp(30px, 3.6vw, 43px);
+  font-weight: 790;
+  line-height: 1.22;
+  letter-spacing: -0.045em;
+}
+
+.intro h1 span {
+  color: var(--accent);
+  margin-right: 5px;
+}
+
+.intro-desc {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
 .content-head {
   display: flex;
-  gap: 24px;
+  gap: 12px;
   align-items: flex-end;
   justify-content: space-between;
   animation: content-in 0.5s ease both;
+}
+
+.content-head.files-head {
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.content-head.files-head .head-copy h1 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 16px;
+  font-weight: 760;
+  letter-spacing: 0;
+  line-height: 1.35;
+}
+
+.content-head.files-head .head-copy h1::before {
+  content: "";
+  width: 4px;
+  height: 15px;
+  border-radius: 3px;
+  background: var(--accent);
+}
+
+.files-meta {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-left: auto;
+}
+
+.storage-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 7px;
+  border: 1px solid #d8e9df;
+  border-radius: 99px;
+  color: #3e7059;
+  background: #f3f8f5;
+  font-size: 11px;
+  line-height: 1.45;
+  white-space: nowrap;
+}
+
+.storage-chip i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.storage-chip.demo {
+  border-color: #f0dfb9;
+  color: #8a6a12;
+  background: #fff8e1;
+}
+
+.file-count {
+  color: var(--muted);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.content-head.files-head .head-actions {
+  flex-wrap: nowrap;
+}
+
+.content-head.files-head .action-button {
+  padding: 5px 9px;
+  border-radius: 7px;
+  font-size: 12px;
+}
+
+.content-head.files-head .action-button svg {
+  width: 13px;
+  height: 13px;
 }
 
 .head-copy {
@@ -2572,6 +2692,10 @@ onBeforeUnmount(() => {
     align-items: flex-start;
     flex-direction: column;
     gap: 18px;
+  }
+
+  .content-head.files-head {
+    align-items: flex-start;
   }
 
   .head-actions {
