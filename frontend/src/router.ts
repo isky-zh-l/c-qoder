@@ -7,16 +7,9 @@ import {
 import { saveScrollPosition } from './utils/scrollMemory'
 import WorkspaceView from './views/WorkspaceView.vue'
 import { beginProgress, endProgress } from './utils/progress'
-import { clearPageLoading, startPageLoading } from './utils/pageLoading'
 
 const routerBase =
   import.meta.env.VITE_ROUTER_BASE || import.meta.env.BASE_URL
-
-const CONTENT_ROUTES = new Set(['document', 'document-edit', 'source-edit'])
-
-function contentLoadingLabel(name: unknown): string {
-  return name === 'source-edit' ? '源码编辑器正在加载…' : name === 'document-edit' ? '编辑器正在加载…' : '笔记正在加载中…'
-}
 
 const router = createRouter({
   history: createWebHashHistory(routerBase),
@@ -73,9 +66,6 @@ const router = createRouter({
 
 router.beforeEach(async (to, from) => {
   beginProgress()
-  if (CONTENT_ROUTES.has(String(to.name))) {
-    startPageLoading(contentLoadingLabel(to.name))
-  }
   if (from.name && from.fullPath !== to.fullPath) {
     saveScrollPosition(from.fullPath)
   }
@@ -106,14 +96,9 @@ router.beforeEach(async (to, from) => {
 })
 
 router.afterEach((to, from, failure) => {
-  if (failure) {
-    endProgress()
-    clearPageLoading()
-    return
-  }
   endProgress()
-  if (!CONTENT_ROUTES.has(String(to.name))) {
-    clearPageLoading()
+  if (failure) {
+    return
   }
   const title = typeof to.meta.title === 'string' ? to.meta.title : ''
   document.title = title ? `${title} · C 语言学习笔记` : 'C 语言学习笔记'
@@ -121,7 +106,6 @@ router.afterEach((to, from, failure) => {
 
 router.onError(() => {
   endProgress()
-  clearPageLoading()
 })
 
 export default router

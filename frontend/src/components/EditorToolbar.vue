@@ -82,9 +82,13 @@ const collapsed = ref(readToolbarCollapsed())
 
 function readToolbarCollapsed(): boolean {
   try {
-    return window.localStorage.getItem(TOOLBAR_KEY) === '1'
+    const stored = window.localStorage.getItem(TOOLBAR_KEY)
+    if (stored === null) {
+      return window.innerWidth <= 960
+    }
+    return stored === '1'
   } catch {
-    return false
+    return window.innerWidth <= 960
   }
 }
 

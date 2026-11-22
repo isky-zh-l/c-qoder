@@ -2,7 +2,6 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import type { DocumentSummary } from '../api/types'
-import { formatRelativeTime } from '../utils/format'
 
 const props = withDefaults(
   defineProps<{
@@ -48,7 +47,20 @@ const kindClass = computed(() =>
   props.doc.kind === 'source' ? 'kind-source' : 'kind-note',
 )
 
-const formattedTime = computed(() => formatRelativeTime(props.doc.updated_at))
+const formattedTime = computed(() => {
+  const date = new Date(props.doc.updated_at)
+  if (Number.isNaN(date.getTime())) {
+    return ''
+  }
+  return `${date.getMonth() + 1}月${date.getDate()}日`
+})
+
+const languageLabel = computed(() => {
+  if (props.doc.kind === 'note') {
+    return 'MD'
+  }
+  return props.doc.language === 'h' ? 'H' : 'C'
+})
 
 function toggleMenu() {
   menuOpen.value = !menuOpen.value
@@ -143,6 +155,7 @@ onBeforeUnmount(() => {
           </span>
           <span class="meta-dot" aria-hidden="true"></span>
           <time :datetime="doc.updated_at">{{ formattedTime }}</time>
+          <span class="meta-lang">{{ languageLabel }}</span>
         </div>
       </div>
     </RouterLink>
@@ -873,6 +886,230 @@ onBeforeUnmount(() => {
 
   .doc-card.v2 .drag-handle {
     display: none;
+  }
+}
+/* Legacy file card */
+.doc-card.v2 {
+  position: relative;
+  align-items: center;
+  border-color: #e7e3f1;
+  border-radius: 13px;
+  background: #fff;
+  box-shadow: 0 2px 10px rgba(76, 55, 130, 0.05);
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.doc-card.v2:hover {
+  transform: translateY(-2px);
+  border-color: #cbbcf0;
+  box-shadow: 0 12px 26px -20px rgba(73, 55, 119, 0.42);
+}
+
+.doc-card.v2::after {
+  position: absolute;
+  top: 20px;
+  bottom: 20px;
+  left: 0;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--accent);
+  opacity: 0;
+  content: "";
+  transition: opacity 0.18s ease;
+}
+
+.doc-card.v2.kind-source::after {
+  background: #4f7fbf;
+}
+
+.doc-card.v2:hover::after {
+  opacity: 0.9;
+}
+
+.doc-card.v2 .doc-main {
+  align-items: center;
+  gap: 16px;
+  padding: 20px 10px 20px 20px;
+}
+
+.doc-card.v2 .doc-icon {
+  flex-basis: 52px;
+  height: 52px;
+  border-radius: 13px;
+  color: #5437bd;
+  background: #eee8ff;
+}
+
+.doc-card.v2.kind-source .doc-icon {
+  color: #3f6fae;
+  background: #eaf1fb;
+}
+
+.doc-card.v2 .doc-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.doc-card.v2 .doc-title {
+  color: #2f2745;
+  font-size: 20px;
+  font-weight: 720;
+  letter-spacing: -0.015em;
+  line-height: 1.3;
+}
+
+.doc-card.v2 .doc-heading {
+  gap: 4px 9px;
+}
+
+.doc-card.v2 .kind-tag {
+  padding: 2px 7px;
+  border-radius: 5px;
+  color: #5437bd;
+  background: #eee8ff;
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.doc-card.v2.kind-source .kind-tag {
+  color: #325a99;
+  background: #e9f1ff;
+}
+
+.doc-card.v2 .doc-summary {
+  display: none;
+}
+
+.doc-card.v2 .doc-meta {
+  gap: 3px 8px;
+  margin-top: 6px;
+  color: #8a839c;
+  font-size: 12.5px;
+}
+
+.doc-card.v2 .doc-chapter {
+  color: #5437bd;
+  font-weight: 650;
+}
+
+.doc-card.v2.kind-source .doc-chapter {
+  color: #325a99;
+}
+
+.doc-card.v2 .meta-lang {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.02em;
+}
+
+.doc-card.v2 .meta-folder {
+  color: #8a839c;
+}
+
+.doc-card.v2 .doc-side {
+  align-items: center;
+  gap: 2px;
+  padding: 0 12px 0 0;
+}
+
+.doc-card.v2 .star-button {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  color: #a9a0bb;
+}
+
+.doc-card.v2 .star-button:hover {
+  color: var(--favorite-gold);
+  background: #fbf3df;
+}
+
+.doc-card.v2 .star-button.active {
+  color: var(--favorite-gold);
+  background: #fbf3df;
+}
+
+.doc-card.v2 .doc-menu .icon-button {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+}
+
+.doc-card.v2 .doc-menu .icon-button svg {
+  transform: rotate(90deg);
+}
+
+.doc-card.v2 .folder-drag-button {
+  display: none;
+}
+
+.doc-card.v2 .drag-handle {
+  width: 18px;
+  height: 44px;
+  margin-left: 0;
+  opacity: 0;
+  transition: opacity 0.16s ease;
+}
+
+.doc-card.v2:hover .drag-handle,
+.doc-card.v2:focus-within .drag-handle {
+  opacity: 0.45;
+}
+
+.doc-card.v2 .sort-controls {
+  position: absolute;
+  right: 12px;
+  bottom: 3px;
+  padding: 0;
+  opacity: 0;
+}
+
+.doc-card.v2:hover .sort-controls,
+.doc-card.v2:focus-within .sort-controls {
+  opacity: 1;
+}
+
+.doc-card.v2 .sort-controls .icon-button {
+  width: 22px;
+  height: 18px;
+}
+
+@media (max-width: 700px) {
+  .doc-card.v2 .doc-main {
+    gap: 12px;
+    padding: 15px 8px 15px 14px;
+  }
+
+  .doc-card.v2 .doc-icon {
+    flex-basis: 42px;
+    height: 42px;
+    border-radius: 11px;
+  }
+
+  .doc-card.v2 .doc-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .doc-card.v2 .doc-title {
+    font-size: 17px;
+  }
+
+  .doc-card.v2 .doc-meta {
+    font-size: 11.5px;
+  }
+
+  .doc-card.v2 .doc-side {
+    padding-right: 4px;
+  }
+
+  .doc-card.v2 .star-button,
+  .doc-card.v2 .doc-menu .icon-button {
+    width: 32px;
+    height: 32px;
   }
 }
 </style>

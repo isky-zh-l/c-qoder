@@ -18,9 +18,9 @@
   --surface-soft: #fbfaff;
   --text: var(--site-fg);
   --muted: var(--site-muted);
-  --muted-strong: #5f5875;
+  --muted-strong: #4f4b63;
   --border: var(--site-border);
-  --border-strong: #d8cff2;
+  --border-strong: #d8d2e6;
   --accent: var(--site-accent);
   --accent-strong: #452ba9;
   --accent-soft: #ede7ff;
@@ -31,8 +31,8 @@
   --result-border: #c7ead5;
   --source-badge: #eef6ff;
   --source-text: #3f6fae;
-  --shadow-soft: 0 18px 50px -32px rgba(61, 42, 120, 0.5);
-  --shadow-lift: 0 24px 60px -32px rgba(72, 47, 148, 0.45);
+  --shadow-soft: 0 4px 8px rgba(53, 39, 88, 0.03), 0 16px 24px -20px rgba(73, 55, 119, 0.28);
+  --shadow-lift: 0 6px 14px rgba(53, 39, 88, 0.05), 0 20px 30px -22px rgba(73, 55, 119, 0.4);
   --radius-lg: var(--site-radius);
   --radius-md: calc(var(--site-radius) * 0.75);
   --radius-sm: calc(var(--site-radius) * 0.5);
@@ -159,7 +159,7 @@ ol {
 }
 
 ::selection {
-  background: rgba(115, 87, 255, 0.18);
+  background: rgba(84, 55, 189, 0.16);
 }
 
 .hl-yellow {

@@ -36,7 +36,6 @@ import {
 } from '../utils/editorModel'
 import { sourceFromModules } from '../utils/source'
 import { beginProgress, endProgress } from '../utils/progress'
-import { currentPageLoadingToken, endPageLoading } from '../utils/pageLoading'
 import ChapterPicker from '../components/ChapterPicker.vue'
 import DocumentBlocks from '../components/DocumentBlocks.vue'
 import EditorModuleCard from '../components/EditorModuleCard.vue'
@@ -281,7 +280,6 @@ async function loadWorkspace() {
 
 async function loadDocument(showLoading = true) {
   const token = ++loadToken
-  const pageToken = currentPageLoadingToken()
   saveRequestId += 1
   saving.value = false
   if (showLoading) {
@@ -334,7 +332,6 @@ async function loadDocument(showLoading = true) {
     }
     if (showLoading) {
       endProgress()
-      endPageLoading(pageToken)
     }
   }
 }
@@ -1361,12 +1358,8 @@ onBeforeUnmount(() => {
     </header>
 
     <main class="editor-main">
-      <div v-if="loading" class="editor-skeleton" aria-busy="true">
-        <p class="sr-only" role="status">正在加载编辑器</p>
-        <span class="skeleton-title"></span>
-        <span class="skeleton-line"></span>
-        <span class="skeleton-block"></span>
-        <span class="skeleton-block short"></span>
+      <div v-if="loading" class="editor-loading" role="status" aria-live="polite">
+        <p>正在准备编辑器…</p>
       </div>
 
       <section v-else-if="loadError" class="editor-error" role="alert">
@@ -2319,6 +2312,150 @@ onBeforeUnmount(() => {
     min-height: 34px;
     padding: 6px 8px;
     font-size: 10.5px;
+  }
+}
+/* Legacy editor shell */
+.editor-topbar {
+  height: 62px;
+  padding: 0 24px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.94);
+}
+
+.editor-page-label {
+  color: #2f2745;
+  font-size: 13.5px;
+  font-weight: 700;
+}
+
+.topbar-status {
+  color: #8a839c;
+  font-size: 12px;
+}
+
+.topbar-button {
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  color: var(--muted-strong);
+  font-size: 12.5px;
+  font-weight: 650;
+  background: #fff;
+  transition:
+    transform 0.16s ease,
+    border-color 0.16s ease,
+    color 0.16s ease,
+    background 0.16s ease;
+}
+
+.topbar-button:hover:not(:disabled) {
+  border-color: #cbbcf0;
+  color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.topbar-button.primary {
+  border-color: #4a2fa8;
+  color: #fff;
+  background: linear-gradient(125deg, #4e36c0, #7149cf);
+  box-shadow: 0 4px 10px rgba(81, 53, 179, 0.22);
+}
+
+.topbar-button.primary:hover:not(:disabled) {
+  color: #fff;
+  background: #452ba9;
+}
+
+.editor-main {
+  width: min(1120px, 100%);
+  margin: 0 auto;
+  padding: 26px 32px 60px;
+}
+
+.editor-head {
+  padding: 0 2px;
+}
+
+.title-input {
+  color: #242139;
+  font-size: clamp(26px, 3.4vw, 32px);
+  font-weight: 780;
+  letter-spacing: -0.035em;
+}
+
+.editor-layout {
+  gap: 22px;
+  grid-template-columns: minmax(0, 1fr) 238px;
+}
+
+.module-list {
+  gap: 11px;
+}
+
+.editor-loading {
+  margin-top: 6px;
+  padding: 46px 20px;
+  border: 1px dashed #d9d2e8;
+  border-radius: 13px;
+  color: #8a839c;
+  font-size: 14px;
+  text-align: center;
+  background: #fff;
+}
+
+.editor-loading p {
+  margin: 0;
+}
+
+@media (max-width: 960px) {
+  .editor-main {
+    padding: 18px 14px 50px;
+  }
+
+  .editor-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .editor-loading {
+    padding: 36px 14px;
+  }
+}
+
+@media (max-width: 760px) {
+  .editor-topbar {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+    padding: 0 12px;
+  }
+
+  .editor-page-label {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .demo-chip,
+  .topbar-status {
+    display: none;
+  }
+
+  .topbar-left {
+    min-width: 0;
+  }
+
+  .topbar-actions {
+    gap: 5px;
+  }
+
+  .topbar-button {
+    padding: 0 9px;
+    font-size: 12px;
+  }
+
+  .history-controls button {
+    width: 26px;
+    height: 26px;
   }
 }
 </style>

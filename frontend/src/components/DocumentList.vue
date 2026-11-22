@@ -327,14 +327,9 @@ onBeforeUnmount(() => {
 <template>
   <section class="library" :aria-busy="loading">
     <template v-if="loading">
-      <p class="sr-only" role="status">正在加载笔记</p>
-      <div class="skeleton-list">
-        <div v-for="index in 3" :key="index" class="skeleton-row">
-          <span class="skeleton-title"></span>
-          <span class="skeleton-line"></span>
-          <span class="skeleton-line skeleton-line-short"></span>
-        </div>
-      </div>
+      <p class="list-placeholder" role="status" aria-live="polite">
+        正在读取文件…
+      </p>
     </template>
 
     <div v-else-if="errorMessage" class="state-card error-card" role="alert">
@@ -413,7 +408,7 @@ onBeforeUnmount(() => {
     <template v-else>
       <p v-if="localDocs.length > 1 && !sorting" class="sort-hint">
         <span class="hint-line" aria-hidden="true"></span>
-        拖动左侧把手排序；卡片右侧文件夹图标可拖到目录
+        拖动卡片右侧把手排序；文档菜单里可移动到文件夹
       </p>
       <div ref="listRoot" class="doc-list-wrap">
         <TransitionGroup
@@ -688,6 +683,33 @@ onBeforeUnmount(() => {
 
   .sort-hint {
     display: none;
+  }
+}
+/* Legacy list states */
+.list-placeholder {
+  margin: 0;
+  padding: 46px 20px;
+  border: 1px dashed #d9d2e8;
+  border-radius: 13px;
+  color: #8a839c;
+  font-size: 14px;
+  text-align: center;
+  background: #fff;
+}
+
+.doc-list {
+  gap: 10px;
+}
+
+.sort-hint {
+  margin-bottom: 8px;
+  color: #9a93ab;
+  font-size: 11.5px;
+}
+
+@media (max-width: 640px) {
+  .list-placeholder {
+    padding: 36px 14px;
   }
 }
 </style>

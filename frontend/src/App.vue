@@ -3,7 +3,6 @@ import { onMounted } from 'vue'
 import { RouterView } from 'vue-router'
 import BackgroundDecor from './components/BackgroundDecor.vue'
 import TopProgress from './components/TopProgress.vue'
-import PageLoading from './components/PageLoading.vue'
 import { loadSiteTitle } from './site'
 
 onMounted(loadSiteTitle)
@@ -12,7 +11,6 @@ onMounted(loadSiteTitle)
 <template>
   <div class="app-root">
     <TopProgress />
-    <PageLoading />
     <BackgroundDecor />
     <RouterView />
   </div>

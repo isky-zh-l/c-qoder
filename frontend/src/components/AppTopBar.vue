@@ -23,6 +23,8 @@ const props = withDefaults(
 const emit = defineEmits<{
   'open-favorites': []
   'open-recycle': []
+  'create-note': []
+  'upload-files': []
   logout: []
 }>()
 
@@ -149,6 +151,40 @@ onBeforeUnmount(() => {
         </RouterLink>
       </nav>
 
+      <div class="topbar-actions">
+        <button
+          type="button"
+          class="topbar-action soft"
+          @click="emit('create-note')"
+        >
+          <svg viewBox="0 0 18 18" fill="none" aria-hidden="true">
+            <path
+              d="M9 3.5v11M3.5 9h11"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+            />
+          </svg>
+          新建笔记
+        </button>
+        <button
+          type="button"
+          class="topbar-action primary"
+          @click="emit('upload-files')"
+        >
+          <svg viewBox="0 0 18 18" fill="none" aria-hidden="true">
+            <path
+              d="M9 12V3.5m0 0L5.8 6.7M9 3.5l3.2 3.2M3.8 11.5v2.2c0 .7.6 1.3 1.3 1.3h7.8c.7 0 1.3-.6 1.3-1.3v-2.2"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          上传文件
+        </button>
+      </div>
+
       <div ref="menuRoot" class="account-menu">
         <button
           type="button"
@@ -177,14 +213,14 @@ onBeforeUnmount(() => {
             </div>
             <button
               type="button"
-              class="menu-action mobile-only"
+              class="menu-action"
               @click="emit('open-favorites'); closeMenu()"
             >
               收藏 · {{ favoriteCount }}
             </button>
             <button
               type="button"
-              class="menu-action mobile-only"
+              class="menu-action"
               @click="emit('open-recycle'); closeMenu()"
             >
               回收站 · {{ recycleCount }}
@@ -540,6 +576,168 @@ onBeforeUnmount(() => {
   .topbar {
     background: #f9f6ff;
     backdrop-filter: none;
+  }
+}
+
+/* Legacy top bar */
+.topbar {
+  background: rgba(255, 255, 255, 0.93);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+
+.topbar-inner {
+  width: min(1200px, 100%);
+  height: 62px;
+  gap: 14px;
+  padding: 0 24px;
+}
+
+.brand-glyph {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  font-size: 18px;
+  background: linear-gradient(125deg, #4e36c0, #7149cf);
+  box-shadow: 0 3px 7px rgba(81, 53, 179, 0.23);
+}
+
+.brand-name {
+  font-size: 17px;
+  font-weight: 740;
+}
+
+.brand-sub {
+  display: none;
+}
+
+.topnav {
+  display: none;
+}
+
+.topnav-link {
+  padding: 7px 10px;
+  border-radius: 7px;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.topnav-link:hover,
+.topnav-link.active {
+  border-color: transparent;
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.topbar-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-left: auto;
+}
+
+.topbar-action {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  height: 38px;
+  padding: 0 14px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+  transition:
+    transform 0.16s ease,
+    background 0.16s ease,
+    border-color 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+.topbar-action svg {
+  width: 16px;
+  height: 16px;
+}
+
+.topbar-action.soft {
+  border: 1px solid #dcd0f4;
+  color: var(--accent);
+  background: #f6f0ff;
+}
+
+.topbar-action.soft:hover {
+  border-color: #c3aef2;
+  background: var(--accent-soft);
+  transform: translateY(-1px);
+}
+
+.topbar-action.primary {
+  border: 1px solid #4a2fa8;
+  color: #fff;
+  background: linear-gradient(125deg, #4e36c0, #7149cf);
+  box-shadow: 0 4px 10px rgba(81, 53, 179, 0.25);
+}
+
+.topbar-action.primary:hover {
+  background: #452ba9;
+  transform: translateY(-1px);
+}
+
+.account-trigger {
+  border-radius: 8px;
+  background: transparent;
+}
+
+.account-avatar {
+  border-radius: 8px;
+  background: linear-gradient(125deg, #4e36c0, #7149cf);
+  font-size: 12px;
+}
+
+.account-name {
+  font-size: 12px;
+}
+
+@media (max-width: 1180px) {
+  .topbar-action {
+    padding: 0 10px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 760px) {
+  .topbar-inner {
+    height: calc(58px + env(safe-area-inset-top));
+    gap: 6px;
+  }
+
+  .topbar-actions {
+    gap: 5px;
+    margin-left: auto;
+  }
+
+  .topbar-action {
+    height: 34px;
+    padding: 0 9px;
+    font-size: 12px;
+  }
+
+  .topbar-action.soft {
+    display: none;
+  }
+
+  .topnav {
+    display: none;
+  }
+
+  .brand-name {
+    font-size: 15px;
+    max-width: 46vw;
+  }
+}
+
+@media (max-width: 960px) {
+  .topbar {
+    background: rgba(255, 255, 255, 0.96);
   }
 }
 </style>

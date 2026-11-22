@@ -18,7 +18,6 @@ import {
   restoreScrollPosition,
 } from '../utils/scrollMemory'
 import { beginProgress, endProgress } from '../utils/progress'
-import { currentPageLoadingToken, endPageLoading } from '../utils/pageLoading'
 import DeleteDocumentDialog from '../components/DeleteDocumentDialog.vue'
 import DocumentBlocks from '../components/DocumentBlocks.vue'
 import EditDocumentDialog from '../components/EditDocumentDialog.vue'
@@ -137,7 +136,6 @@ async function loadWorkspace() {
 
 async function loadDocument(showLoading = true) {
   const token = ++loadToken
-  const pageToken = currentPageLoadingToken()
   if (showLoading) {
     loading.value = true
     document.value = null
@@ -153,6 +151,14 @@ async function loadDocument(showLoading = true) {
     const data = await getDocument(id)
     if (token === loadToken) {
       document.value = data
+      const run = () => {
+        void import('./EditorView.vue')
+      }
+      if (typeof window.requestIdleCallback === 'function') {
+        window.requestIdleCallback(run, { timeout: 2500 })
+      } else {
+        window.setTimeout(run, 1200)
+      }
       if (showLoading) {
         const restored = restoreScrollPosition(route.fullPath)
         if (!restored) {
@@ -179,7 +185,6 @@ async function loadDocument(showLoading = true) {
     }
     if (showLoading) {
       endProgress()
-      endPageLoading(pageToken)
     }
   }
 }
@@ -298,7 +303,7 @@ onBeforeUnmount(() => {
               stroke-linejoin="round"
             />
           </svg>
-          退出到主页
+          返回文件
         </button>
         <span class="reading-topbar-title">
           {{ document?.title || siteTitle }}
@@ -361,13 +366,8 @@ onBeforeUnmount(() => {
     </header>
 
     <main class="reading-main">
-      <div v-if="loading" class="reading-skeleton" aria-busy="true">
-        <p class="sr-only" role="status">正在加载文档</p>
-        <span class="skeleton-chip"></span>
-        <span class="skeleton-title"></span>
-        <span class="skeleton-line"></span>
-        <span class="skeleton-line short"></span>
-        <span class="skeleton-block"></span>
+      <div v-if="loading" class="reading-loading" role="status" aria-live="polite">
+        <p>正在读取文件…</p>
       </div>
 
       <div v-else-if="errorMessage" class="reading-error" role="alert">
@@ -1235,6 +1235,126 @@ onBeforeUnmount(() => {
 
   .toast {
     top: 70px;
+  }
+}
+/* Legacy reading shell */
+.reading-topbar {
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(12px);
+}
+
+.reading-topbar-inner {
+  width: min(960px, 100%);
+  min-height: 62px;
+  padding: 8px 24px;
+}
+
+.reading-exit {
+  color: #4f4b63;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.reading-topbar-title {
+  color: #2f2745;
+  font-size: 14px;
+  font-weight: 650;
+  text-align: left;
+}
+
+.read-action {
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  color: var(--muted-strong);
+  font-size: 12.5px;
+  font-weight: 650;
+  background: #fff;
+  transition:
+    transform 0.16s ease,
+    border-color 0.16s ease,
+    background 0.16s ease,
+    color 0.16s ease;
+}
+
+.read-action:hover {
+  border-color: #cbbcf0;
+  color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.read-action.star-action.active {
+  border-color: #ecd9ad;
+  color: #8a6a12;
+  background: #fbf3df;
+}
+
+.read-action.edit-action {
+  border-color: #d9c9f7;
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.read-action.edit-action:hover {
+  border-color: #bda6ef;
+  background: #e6dcff;
+}
+
+.read-more summary {
+  height: 36px;
+  border-radius: 7px;
+  color: var(--muted-strong);
+  font-size: 12.5px;
+}
+
+.reading-main {
+  width: min(860px, 100%);
+  padding: 34px 32px 40px;
+}
+
+.reading-loading {
+  margin-top: 6px;
+  padding: 46px 20px;
+  border: 1px dashed #d9d2e8;
+  border-radius: 13px;
+  color: #8a839c;
+  font-size: 14px;
+  text-align: center;
+  background: #fff;
+}
+
+.reading-loading p {
+  margin: 0;
+}
+
+.reading-head h1 {
+  color: #242139;
+  font-size: clamp(28px, 4vw, 36px);
+  font-weight: 790;
+  letter-spacing: -0.04em;
+  line-height: 1.25;
+}
+
+.reading-head {
+  padding: 4px 2px 0;
+}
+
+.doc-submeta {
+  font-size: 12px;
+}
+
+@media (max-width: 640px) {
+  .reading-topbar-inner {
+    padding: 7px 12px;
+  }
+
+  .reading-main {
+    padding: 20px 16px 32px;
+  }
+
+  .reading-loading {
+    padding: 36px 14px;
   }
 }
 </style>

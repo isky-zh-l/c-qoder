@@ -137,6 +137,22 @@ const toast = ref<{
 let toastTimer: number | null = null
 let toastId = 0
 let loadToken = 0
+let readerPrefetched = false
+
+function prefetchReaderChunk() {
+  if (readerPrefetched) {
+    return
+  }
+  readerPrefetched = true
+  const run = () => {
+    void import('./DocumentView.vue')
+  }
+  if (typeof window.requestIdleCallback === 'function') {
+    window.requestIdleCallback(run, { timeout: 2500 })
+  } else {
+    window.setTimeout(run, 1200)
+  }
+}
 
 const user = computed(() => authState.user)
 const chapters = computed(() => workspace.value?.chapters ?? [])
@@ -481,6 +497,7 @@ async function loadDocuments(showSkeleton = false) {
       return
     }
     documents.value = data
+    prefetchReaderChunk()
   } catch (error) {
     if (token !== loadToken) {
       return
@@ -1204,6 +1221,8 @@ onBeforeUnmount(() => {
       :active="activeTopbar"
       @open-favorites="selectFavorites"
       @open-recycle="recycleOpen = true"
+      @create-note="openCreate('note')"
+      @upload-files="openCreate('import')"
       @logout="handleLogout"
     />
 
@@ -1282,21 +1301,6 @@ onBeforeUnmount(() => {
             <div class="head-actions">
               <button
                 type="button"
-                class="action-button primary"
-                @click="openCreate('note')"
-              >
-                <svg viewBox="0 0 18 18" fill="none" aria-hidden="true">
-                  <path
-                    d="M9 3v12M3 9h12"
-                    stroke="currentColor"
-                    stroke-width="1.5"
-                    stroke-linecap="round"
-                  />
-                </svg>
-                新建笔记
-              </button>
-              <button
-                type="button"
                 class="action-button"
                 @click="openCreate('source')"
               >
@@ -1310,22 +1314,6 @@ onBeforeUnmount(() => {
                   />
                 </svg>
                 新建 C 文件
-              </button>
-              <button
-                type="button"
-                class="action-button ghost"
-                @click="openCreate('import')"
-              >
-                <svg viewBox="0 0 18 18" fill="none" aria-hidden="true">
-                  <path
-                    d="M9 12V3m0 0L6 6m3-3 3 3M3.5 11v2.5A1.5 1.5 0 0 0 5 15h8a1.5 1.5 0 0 0 1.5-1.5V11"
-                    stroke="currentColor"
-                    stroke-width="1.4"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
-                </svg>
-                上传
               </button>
               <button
                 type="button"
@@ -3111,6 +3099,156 @@ onBeforeUnmount(() => {
 
   .child-folder-grid {
     grid-template-columns: 1fr;
+  }
+}
+/* Legacy workspace shell */
+.workspace-page {
+  padding-bottom: 32px;
+}
+
+.workspace-layout {
+  grid-template-columns: 300px minmax(0, 1fr);
+  width: min(1200px, 100%);
+}
+
+.sidebar {
+  top: 62px;
+  height: calc(100vh - 62px);
+  gap: 18px;
+  padding: 24px 20px 22px 26px;
+  border-right: 1px solid rgba(231, 225, 247, 0.82);
+  background: #fbfaff;
+}
+
+.main-content {
+  max-width: 900px;
+  padding: 30px 40px 48px;
+}
+
+.intro {
+  margin-bottom: 24px;
+}
+
+.intro h1 {
+  font-size: clamp(28px, 3.6vw, 43px);
+  font-weight: 790;
+  letter-spacing: -0.045em;
+}
+
+.intro-desc {
+  font-size: 14px;
+}
+
+.content-head {
+  align-items: center;
+}
+
+.content-head h1 {
+  font-size: 16px;
+  font-weight: 760;
+  letter-spacing: 0;
+}
+
+.head-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.action-button {
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  color: var(--muted-strong);
+  font-size: 12.5px;
+  font-weight: 650;
+  background: #fff;
+  transition:
+    transform 0.16s ease,
+    border-color 0.16s ease,
+    background 0.16s ease,
+    color 0.16s ease;
+}
+
+.action-button svg {
+  width: 15px;
+  height: 15px;
+}
+
+.action-button:hover {
+  border-color: #cbbcf0;
+  color: var(--accent);
+  background: var(--accent-faint);
+  transform: translateY(-1px);
+}
+
+.action-button.primary {
+  border-color: #4a2fa8;
+  color: #fff;
+  background: linear-gradient(125deg, #4e36c0, #7149cf);
+}
+
+.action-button.ghost {
+  background: #fff;
+}
+
+.workspace-search {
+  height: 42px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: none;
+}
+
+.workspace-search input {
+  font-size: 13px;
+}
+
+.search-scope {
+  border-radius: 5px;
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.context-bar {
+  border: 0;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.chapter-folder-section {
+  border-radius: 13px;
+}
+
+.child-folder {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #fff;
+  transition:
+    transform 0.16s ease,
+    border-color 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+.child-folder:hover {
+  border-color: #cbbcf0;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-soft);
+}
+
+.child-folder.drop-target {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(84, 55, 189, 0.1);
+}
+
+@media (max-width: 960px) {
+  .workspace-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .main-content {
+    padding: 20px 16px 40px;
   }
 }
 </style>
