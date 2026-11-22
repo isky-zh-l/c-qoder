@@ -85,7 +85,7 @@ const emptyCopy = computed(() => {
     return '在任意笔记卡片上点亮金色星标，它就会成为独立书架，不影响原列表顺序。'
   }
   if (props.scope === 'chapter') {
-    return '换一个章节看看，或回到全部笔记。'
+    return '换一个章节看看，或回到全部文件。'
   }
   if (props.scope === 'folder') {
     return '新建子文件夹、移动文档进来，或回到上级目录。'

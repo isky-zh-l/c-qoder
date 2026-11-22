@@ -349,7 +349,7 @@ onBeforeUnmount(() => {
           @click="emit('select-library')"
         >
           <span class="item-dot"></span>
-          <span class="item-name">全部笔记</span>
+          <span class="item-name">全部文件</span>
           <span class="nav-count">{{ libraryCount }}</span>
         </button>
       </li>
@@ -486,7 +486,7 @@ onBeforeUnmount(() => {
     </button>
 
     <p v-if="!localChapters.length" class="chapter-empty">
-      还没有章节。新建一个，或直接把笔记放进“全部笔记”。
+      还没有章节。新建一个，或直接把笔记放进“全部文件”。
     </p>
   </nav>
 </template>
