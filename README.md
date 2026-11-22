@@ -7,6 +7,7 @@
 - **仓库**：https://github.com/isky-zh-l/c-qoder
 - **技术栈**：Vue 3 + TypeScript + Vite、Qoder Sites（Deno Edge Function + 数据库 + Storage）
 - **用途**：可直接复用为个人笔记站；替换标题、示例内容和 AI 配置即可做成自己的版本
+- **交接文档**：[HANDOFF.md](./HANDOFF.md)（给下一个 Agent 的源码与部署说明）
 
 ## 项目结构
 
