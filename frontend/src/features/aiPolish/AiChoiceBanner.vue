@@ -79,7 +79,7 @@ function handleChange() {
 }
 
 onMounted(() => {
-  void load()
+  window.setTimeout(() => void load(), 600)
   window.addEventListener(AI_POLISH_EVENT, handleChange)
   window.addEventListener('focus', handleChange)
   document.addEventListener('visibilitychange', handleChange)

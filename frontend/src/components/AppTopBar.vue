@@ -538,8 +538,8 @@ onBeforeUnmount(() => {
 }
 @media (max-width: 960px) {
   .topbar {
-    background: rgba(249, 246, 255, 0.82);
-    backdrop-filter: blur(18px);
+    background: #f9f6ff;
+    backdrop-filter: none;
   }
 }
 </style>

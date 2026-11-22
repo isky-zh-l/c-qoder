@@ -863,7 +863,7 @@ export function application({ db, storage, getUser, requireUser, onError }) {
 
   async function ensureDemoSeed() {
     try {
-      await currentProfile({
+      const demoProfile = await currentProfile({
         user_id: DEMO_OWNER_ID,
         name: '示例学习者',
         picture: '',
@@ -906,8 +906,10 @@ export function application({ db, storage, getUser, requireUser, onError }) {
           }
         }
       }
+      return demoProfile;
     } catch (error) {
       console.error('demo_seed_failed', error?.message || error);
+      return null;
     }
   }
 
@@ -1961,10 +1963,26 @@ export function application({ db, storage, getUser, requireUser, onError }) {
       }
 
       if (path === '/api/public/demo/start' && method === 'POST') {
-        await ensureDemoSeed();
+        let profile = await ensureDemoSeed();
+        if (!profile) {
+          try {
+            profile = await currentProfile({
+              user_id: DEMO_OWNER_ID,
+              name: '示例学习者',
+              picture: '',
+            });
+          } catch {
+            profile = null;
+          }
+        }
         const secure = new URL(request.url).protocol === 'https:' ? '; Secure' : '';
         return json(
-          { demo: true },
+          {
+            demo: true,
+            authenticated: true,
+            user: profile ? serializeProfile(profile) : null,
+            csrf_token: null,
+          },
           200,
           {
             'set-cookie': `cq_demo=1; Path=/; HttpOnly; SameSite=Lax; Max-Age=2592000${secure}`,
@@ -2196,9 +2214,6 @@ export function application({ db, storage, getUser, requireUser, onError }) {
         return json(await usageFor(ownerId, profile));
       }
       if (path === '/api/workspace' && method === 'GET') {
-        if (ownerId === DEMO_OWNER_ID) {
-          await ensureDemoSeed();
-        }
         await purgeExpired(ownerId);
         const [chapters, docs, assets, folders] = await Promise.all([
           chapterRows(ownerId),

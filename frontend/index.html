@@ -10,6 +10,55 @@
     />
     <link rel="icon" type="image/svg+xml" href="%BASE_URL%favicon.svg" />
     <title>C 语言学习笔记</title>
+    <style>
+      .boot-shell {
+        min-height: 100vh;
+        padding: 26px 22px;
+        color: #2f2745;
+        font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+        background: #f7f4ff;
+      }
+      .boot-brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 15px;
+      }
+      .boot-brand span {
+        display: grid;
+        width: 32px;
+        height: 32px;
+        place-items: center;
+        border-radius: 9px;
+        color: #fff;
+        font-weight: 700;
+        background: #6f4df0;
+      }
+      .boot-card {
+        max-width: 640px;
+        margin: 46px auto 0;
+        padding: 20px;
+        border: 1px solid #e8e1f6;
+        border-radius: 16px;
+        background: #fff;
+      }
+      .boot-line {
+        height: 12px;
+        margin-bottom: 10px;
+        border-radius: 6px;
+        background: #f0ebfa;
+        animation: boot-pulse 1.4s ease-in-out infinite;
+      }
+      .boot-line.w50 { width: 50%; }
+      .boot-line.w80 { width: 80%; }
+      .boot-line.w35 { width: 35%; }
+      @keyframes boot-pulse {
+        50% { opacity: 0.45; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .boot-line { animation: none; }
+      }
+    </style>
   </head>
   <body>
     <script>
@@ -26,7 +75,16 @@
         }
       })()
     </script>
-    <div id="app"></div>
+    <div id="app">
+      <div class="boot-shell" aria-hidden="true">
+        <div class="boot-brand"><span>C</span><strong>C 语言学习笔记</strong></div>
+        <div class="boot-card">
+          <div class="boot-line w50"></div>
+          <div class="boot-line w80"></div>
+          <div class="boot-line w35"></div>
+        </div>
+      </div>
+    </div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

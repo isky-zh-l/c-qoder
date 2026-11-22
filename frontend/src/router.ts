@@ -5,6 +5,7 @@ import {
   rememberPostLogin,
 } from './utils/navigation'
 import { saveScrollPosition } from './utils/scrollMemory'
+import WorkspaceView from './views/WorkspaceView.vue'
 
 const routerBase =
   import.meta.env.VITE_ROUTER_BASE || import.meta.env.BASE_URL
@@ -15,7 +16,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'workspace',
-      component: () => import('./views/WorkspaceView.vue'),
+      component: WorkspaceView,
       meta: { requiresAuth: true },
     },
     {

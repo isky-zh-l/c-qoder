@@ -5,11 +5,13 @@ import { extname, join, normalize } from 'node:path';
 import { Readable } from 'node:stream';
 import { fileURLToPath } from 'node:url';
 import { application } from '../functions/routes.mjs';
+import { UserContextError } from '../functions/auth.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const dist = join(root, 'dist');
 const port = Number(process.env.PORT || 4176);
 const saveDelayMs = Number(process.env.SAVE_DELAY_MS || 0);
+const anonMode = process.env.ANON === '1';
 
 const tables = {
   profiles: [],
@@ -306,11 +308,22 @@ const demoUser = {
   session_expires_at: Math.floor(Date.now() / 1000) + 3600,
 };
 
-function getUser() {
+function hasDemoCookie(request) {
+  const cookie = request?.headers?.get?.('cookie') || '';
+  return /(?:^|;\s*)cq_demo=1(?:;|$)/.test(cookie);
+}
+
+function getUser(request) {
+  if (anonMode) return hasDemoCookie(request) ? demoUser : null;
   return demoMode ? demoUser : fixtureUser;
 }
 
-function requireUser() {
+function requireUser(request) {
+  if (anonMode) {
+    const user = getUser(request);
+    if (!user) throw new UserContextError('login_required', 401);
+    return user;
+  }
   return demoMode ? demoUser : fixtureUser;
 }
 

@@ -174,6 +174,13 @@
   }
 }
 
+@media (max-width: 960px) {
+  .circuit-pulse,
+  .star {
+    animation: none;
+  }
+}
+
 @media (min-width: 961px) {
   :global(body.modal-open) .circuit-pulse,
   :global(body.modal-open) .star,

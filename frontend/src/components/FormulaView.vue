@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import 'katex/dist/katex.min.css'
 import katex from 'katex'
 import { onMounted, ref, watch } from 'vue'
 

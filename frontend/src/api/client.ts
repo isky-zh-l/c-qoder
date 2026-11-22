@@ -153,8 +153,15 @@ export function getPublicSite(): Promise<SitePayload> {
   return request<SitePayload>('/public/site')
 }
 
-export function startDemo(): Promise<{ demo: boolean }> {
-  return request<{ demo: boolean }>('/public/demo/start', {
+export interface DemoStartPayload {
+  demo: boolean
+  authenticated?: boolean
+  user?: UserProfile | null
+  csrf_token?: string | null
+}
+
+export function startDemo(): Promise<DemoStartPayload> {
+  return request<DemoStartPayload>('/public/demo/start', {
     method: 'POST',
   })
 }

@@ -570,14 +570,44 @@ watch(
   },
 )
 
+function prefetchReader() {
+  const connection = (
+    navigator as Navigator & {
+      connection?: { saveData?: boolean; effectiveType?: string }
+    }
+  ).connection
+  if (connection?.saveData) return
+  if (connection?.effectiveType && /(^|-)2g$/.test(connection.effectiveType)) {
+    return
+  }
+  const run = () => {
+    void import('../views/DocumentView.vue')
+  }
+  const idle = (
+    window as Window & {
+      requestIdleCallback?: (
+        callback: () => void,
+        options?: { timeout?: number },
+      ) => number
+    }
+  ).requestIdleCallback
+  window.setTimeout(() => {
+    if (idle) {
+      idle(run, { timeout: 3000 })
+    } else {
+      run()
+    }
+  }, 2500)
+}
+
 async function bootstrap() {
   workspaceLoading.value = true
   try {
-    await loadWorkspace(true)
+    await Promise.all([loadWorkspace(true), loadDocuments(true)])
     if (!workspaceError.value) {
-      await loadDocuments(true)
       await nextTick()
       restoreScrollPosition(route.fullPath)
+      prefetchReader()
     }
   } finally {
     workspaceLoading.value = false

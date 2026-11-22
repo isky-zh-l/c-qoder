@@ -33,8 +33,14 @@ export async function ensureSession(force = false): Promise<void> {
         session = { authenticated: false, user: null, csrf_token: null }
       } else if (!session.user && !onLoginPage()) {
         try {
-          await startDemo()
-          session = await getSession()
+          const demo = await startDemo()
+          session = demo.user
+            ? {
+                authenticated: true,
+                user: demo.user,
+                csrf_token: demo.csrf_token ?? null,
+              }
+            : await getSession()
         } catch {
           // 演示入口不可用时仍显示登录页
         }
@@ -85,8 +91,14 @@ export async function logoutAndRedirect(): Promise<void> {
 }
 
 export async function startDemoSession(): Promise<void> {
-  await startDemo()
-  const session = await getSession()
+  const demo = await startDemo()
+  const session = demo.user
+    ? {
+        authenticated: true,
+        user: demo.user,
+        csrf_token: demo.csrf_token ?? null,
+      }
+    : await getSession()
   if (!session.user) {
     throw new Error('示例空间暂时不可用，请稍后重试')
   }
